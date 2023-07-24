@@ -1,0 +1,18 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - KAFKA_BROKER_URL
+      - KAFKA_API_KEY
+      - KAFKA_API_SECRET
+    volumes:
+      - ./:/home/pkafka/
+    depends_on:
+      - kafka_service
+    ports:
+      - 5000:5000
+
+  kafka_service:
+    image: confluentinc/cp-kafka:latest

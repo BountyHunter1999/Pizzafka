@@ -40,14 +40,25 @@ def check_parser_value(config_parser: ConfigParser):
 with open("pizza_service/config.properties", "r") as conf:
     config_parser.read_file(conf)
 
-# config_parser.read("config.properties")
+# check_parser_value(config_parser)
 
-check_parser_value(config_parser)
-
-print(config_parser.get("kafka_client", "sasl.username", vars=os.environ))
 producer_config = dict(config_parser["kafka_client"])
 consumer_config = dict(config_parser["kafka_client"])
 consumer_config.update(config_parser["consumer"])
 
 pizza_producer = Producer(producer_config)
-print(config_parser)
+
+pizza_warmer = {}
+
+
+def order_pizzas(count):
+    order = PizzaOrder(count)
+    # stasb tbe order, while they are in process
+    pizza_warmer[order.id] = order
+    for i in range(count):
+        new_pizza = Pizza()
+        new_pizza.order_id = order.id
+        pizza_producer.produce("pizza", key=order.id, value=new_pizza.toJSON())
+    # make sure all the pizzas events have been sent
+    pizza_producer.flush()
+    return order.id

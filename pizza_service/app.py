@@ -1,7 +1,7 @@
 import json
 
 from flask import Flask
-import service
+from pizza_service import service
 
 app = Flask(__name__)
 
