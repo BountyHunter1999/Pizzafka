@@ -7,12 +7,21 @@ services:
       - KAFKA_BROKER_URL
       - KAFKA_API_KEY
       - KAFKA_API_SECRET
-    volumes:
-      - ./:/home/pkafka/
+    # volumes:
+    #   - ./:/home/pkafka/
     depends_on:
       - kafka_service
     ports:
       - 5000:5000
+    tty: true
 
   kafka_service:
     image: confluentinc/cp-kafka:latest
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    ports:
+      - "9092:9092" # kafka broker port
+      - "9093:9093" # kafka broker port for SASL_SSL
+
+volumes:
+  kafka-data:
