@@ -62,3 +62,10 @@ def order_pizzas(count):
     # make sure all the pizzas events have been sent
     pizza_producer.flush()
     return order.id
+
+def get_order(order_id):
+    order = pizza_warmer[order_id]
+    if order == None:
+        return "Order not found, perhaps it's not ready yet."
+    else:
+        return order.toJSON()
