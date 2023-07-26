@@ -2,6 +2,7 @@ import json
 import os
 import random
 
+# from pizza import Pizza, PizzaOrder
 from configparser import ConfigParser, BasicInterpolation
 from confluent_kafka import Producer, Consumer
 
@@ -19,45 +20,34 @@ with open("pizza_service/config.properties", "r") as conf:
     config_parser.read_file(conf)
 
 client_config = dict(config_parser["kafka_client"])
+cheese_producer = Producer(client_config)
 
-sauce_producer = Producer(client_config)
-pizza_consumer = Consumer(client_config)
-pizza_consumer.subscribe(["pizza"])
+sauce_consumer = Consumer(client_config)
+sauce_consumer.subscribe(['pizza-with-sauce'])
 
 
 def start_service():
     while True:
-        msg = pizza_consumer.poll(1.0)
+        msg = sauce_consumer.poll(0.1)
         if msg is None:
             pass
-        elif err := msg.error():
-            print(f"ERROR! {err}")
+        elif msg.error():
             pass
         else:
             pizza = json.loads(msg.value())
-            add_sauce(msg.key(), pizza)
+            add_cheese(msg.key(), pizza)
 
 
-def add_sauce(order_id, pizza):
-    pizza["sauce"] = calc_sauce()
-    sauce_producer.produce("pizza-with-sauce", key=order_id, value=json.dumps(pizza))
+def add_cheese(order_id, pizza):
+    pizza['cheese'] = calc_cheese()
+    cheese_producer.produce('pizza-with-cheese', key=order_id, value=json.dumps(pizza))
 
 
-def calc_sauce():
-    i = random.randint(0, 8)
-    sauces = [
-        "regular",
-        "light",
-        "extra",
-        "none",
-        "alfredo",
-        "regular",
-        "light",
-        "extra",
-        "alfredo",
-    ]
-    return sauces[i]
+def calc_cheese():
+    i = random.randint(0, 6)
+    cheeses = ['extra', 'none', 'three cheese', 'goat cheese', 'extra', 'three cheese', 'goat cheese']
+    return cheeses[i]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     start_service()

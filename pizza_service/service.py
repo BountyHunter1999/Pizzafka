@@ -4,6 +4,7 @@ import os
 # from pizza import Pizza, PizzaOrder
 from configparser import ConfigParser, BasicInterpolation
 from confluent_kafka import Producer, Consumer
+from pizza import Pizza, PizzaOrder
 
 
 # %(home) will be returned as it is w/o substituting the home value
@@ -62,6 +63,7 @@ def order_pizzas(count):
     # make sure all the pizzas events have been sent
     pizza_producer.flush()
     return order.id
+
 
 def get_order(order_id):
     order = pizza_warmer[order_id]
