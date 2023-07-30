@@ -10,3 +10,8 @@ app = Flask(__name__)
 def order_pizzas(count):
     order_id = service.order_pizzas(int(count))
     return json.dumps({"order_id": order_id})
+
+
+@app.route("/order/<order_id>", methods=["GET"])
+def get_order(order_id):
+    return service.get_order(order_id)
